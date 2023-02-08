@@ -14,45 +14,45 @@ We will make sure all the repos can be easily built for artefact evaluation.
 
 The repo contains the following subdirectories:
 
-#security_monitor
+# security_monitor
 The Citadel Security Monitor
 
-#secure_bootloader
+# secure_bootloader
 The Citadel Secure Bootloader
 
-#linux
+# linux
 Srcipts to build and run Linux on top of the Citadel SM
 
-#sm_kernel_module
+# sm_kernel_module
 Linux Kernel Module and test code to launch an enclave from user-mode in Linux
 (copied out of the linux/build_linux folder)
 
-#crypto_test
+# crypto_test
 Enclave for an end-to-end demo: A cryptographic library isolated inside an enclave.
 (copied out of the security_monitor folder)
 
-#micropython
+# micropython
 Enclave for an end-to-end demo: A light python runtime isolated inside an enclave.
 The port can be found in ports/bare-riscv
 
-#spectre
+# spectre
 Originally a branch of the security_monitor repository.
 The untrusted_infra folder contain the attack and victim code for the demo specter
 attack presented in the Citadel paper.
 
-#riscv-gnu-toolchain
+# riscv-gnu-toolchain
 The toolchain to compile RISC-V code can be found at:
 
 https://github.com/riscv-collab/riscv-gnu-toolchain
 
-#riscy-OOO
+# riscy-OOO
 BSV Source Code for Citadel (built on top of MI6 / Riscy-OOO). 
 Contains the modification for the secure shared memory mechanism introduced by Citadel.
 Contains proper wrappers and libraries to compile/run on AWS C4/F1.
 
-#qemu-sanctum
+# qemu-sanctum
 QEMU with a new target with sanctum hardware mechanism that matches the Citadel processors.
 Used to debug software components.
 
-#hardware_tests
+# hardware_tests
 Simple ASM tests to test Citadel hardware isolation mechanisms.

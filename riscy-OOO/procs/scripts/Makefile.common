@@ -1,0 +1,398 @@
+
+# Copyright (c) 2018 Massachusetts Institute of Technology
+# 
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use, copy,
+# modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# The top makefile should define:
+# PROC: RV64G_OOO or RV64G_MultiCycle
+# USER_CLK_PERIOD: fpga clock period in ns
+# PERF_COUNT: true or false
+# SIM_DRAM_TYPE: AWSF1 or VC707
+# USE_XILINX_FPU: true or false
+# CORE_NUM
+# TSO_MM: true or false
+# L1_CACHE_LRU: true or false
+# STORE_PREFETCH: true or false
+# LR_UP_TO_E: true or false
+# NO_LOAD_RESP_E: true or false
+# SELF_INV_CACHE: max hits in D$
+# SYSTEM_SELF_INV_L1D: true or false
+# SECURITY: true or false
+# SECURE_LLC: true or false
+# SECURE_FLUSH: true or false
+# SECURE_NONE: true or false
+# SECURE_MSHR: true or false
+# SECURE_ARBITER: true or false
+# SIM_LOG_LLC_PARTITION_NUM
+# SIM_LOG_LLC_MSHR_BANK_NUM
+# SIM_LLC_ARBITER_NUM
+# SIM_LLC_ARBITER_LAT
+# DISABLE_SECURE_BW: true or false
+# CHECK_DEADLOCK: true or false
+# RENAME_DEBUG: true or false
+# BUILD_DIR
+
+CONNECTALDIR := $(RISCY_HOME)/connectal
+
+PROJECTDIR = $(BUILD_DIR)/$(BOARD)
+
+PROC_DIR := $(RISCY_HOME)/procs
+PROC_LIB_DIR := $(PROC_DIR)/lib
+PROC_CPP_DIR := $(PROC_DIR)/cpp
+PROC_BSV_DIR := $(PROC_DIR)/$(PROC)
+
+COHERENCE_DIR := $(RISCY_HOME)/coherence/src
+
+FPGAUTILS_DIR := $(RISCY_HOME)/fpgautils
+FPGA_LIB_DIR := $(FPGAUTILS_DIR)/lib
+XILINX_IP_DIR := $(FPGAUTILS_DIR)/xilinx
+CORE_SCRIPT_DIR := $(FPGAUTILS_DIR)/core-scripts
+
+# interfaces
+S2H_INTERFACES = ProcRequest:ProcDmaWrapper.procReq \
+				 BootRomRequest:ProcDmaWrapper.bootRomReq \
+				 MemLoaderRequest:ProcDmaWrapper.memLoaderReq
+H2S_INTERFACES = ProcDmaWrapper:ProcIndication,BootRomIndication,MemLoaderIndication,DeadlockIndication,RenameDebugIndication:host
+
+BSVFILES = $(PROC_LIB_DIR)/ProcIF.bsv \
+		   $(PROC_LIB_DIR)/BootRomIF.bsv \
+		   $(PROC_LIB_DIR)/MemLoaderIF.bsv \
+		   $(PROC_LIB_DIR)/DeadlockIF.bsv \
+		   $(PROC_LIB_DIR)/RenameDebugIF.bsv \
+		   $(PROC_LIB_DIR)/VerificationPacket.bsv \
+		   $(PROC_LIB_DIR)/Performance.bsv
+
+CPPFILES = $(PROC_CPP_DIR)/testproc.cpp \
+		   $(PROC_CPP_DIR)/htif_riscy.cpp \
+		   $(PROC_CPP_DIR)/proc_ind.cpp \
+		   $(PROC_CPP_DIR)/boot_rom.cpp \
+		   $(PROC_CPP_DIR)/mem_loader.cpp \
+		   $(PROC_CPP_DIR)/to_host.cpp \
+		   $(PROC_CPP_DIR)/print_buff.cpp
+
+CONNECTALFLAGS +=  -D XILINX_SYS_CLK --nocache -v
+CONNECTALFLAGS += --bscflags=" -D USER_CLK_PERIOD=$(USER_CLK_PERIOD) "
+CONNECTALFLAGS += --bsvpath=$(FPGA_LIB_DIR) --bsvpath=$(PROC_LIB_DIR) --bsvpath=$(PROC_BSV_DIR) --bsvpath=$(COHERENCE_DIR)
+CONNECTALFLAGS += --verilog $(XILINX_IP_DIR)/reset_regs --verilog $(XILINX_IP_DIR)/fpu
+CONNECTALFLAGS += --cflags=" -std=c++0x "
+CONNECTALFLAGS += --clibdir=$(RISCY_TOOLS)/lib --clib=fesvr
+CONNECTALFLAGS += -I$(RISCY_TOOLS)/include
+
+# device tree compiler: on AWS build machine (C4, centos) there is no dtc in
+# $PATH, so we allow user to specify the location of dtc on run machine (F1,
+# ubuntu)
+DTC_PATH ?= $(shell which dtc)
+ifeq ($(DTC_PATH),)
+$(error dtc not found)
+endif
+CONNECTALFLAGS += --cflags=" -DDTC_PATH=\"$(DTC_PATH)\" "
+
+# core size
+CONNECTALFLAGS += --bscflags=" -D CORE_$(CORE_SIZE) "
+
+# core num
+CONNECTALFLAGS += --bscflags=" -D NUM_CORES=$(CORE_NUM) "
+
+# cache size
+CONNECTALFLAGS += --bscflags=" -D CACHE_$(CACHE_SIZE) "
+
+# mem model
+ifeq ($(TSO_MM),true)
+CONNECTALFLAGS += --bscflags=" -D TSO_MM "
+else ifneq ($(SELF_INV_CACHE),)
+CONNECTALFLAGS += --bscflags=" -D SELF_INV_CACHE -D L1D_MAX_HITS=$(SELF_INV_CACHE) "
+ifeq ($(SYSTEM_SELF_INV_L1D),true)
+CONNECTALFLAGS += --bscflags=" -D SYSTEM_SELF_INV_L1D "
+endif
+else
+endif
+
+# L1 cache LRU replace
+ifeq ($(L1_CACHE_LRU),true)
+CONNECTALFLAGS += --bscflags=" -D L1_CACHE_LRU "
+endif
+
+# store prefetch
+ifeq ($(STORE_PREFETCH),true)
+CONNECTALFLAGS += --bscflags=" -D STORE_PREFETCH "
+endif
+
+# MESI options
+ifeq ($(LR_UP_TO_E),true)
+CONNECTALFLAGS += --bscflags=" -D LR_UP_TO_E "
+endif
+ifeq ($(NO_LOAD_RESP_E),true)
+CONNECTALFLAGS += --bscflags=" -D NO_LOAD_RESP_E "
+endif
+
+# security features
+ifeq ($(SECURITY),true)
+CONNECTALFLAGS += --bscflags=" -D SECURITY "
+CONNECTALFLAGS += --verilog $(PROC_DIR)/verilog
+else ifeq ($(SECURE_LLC),true)
+CONNECTALFLAGS += --bscflags=" -D SECURITY "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_TLB "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_BP "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_CACHE "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_MSHR "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_ARBITER "
+CONNECTALFLAGS += --verilog $(PROC_DIR)/verilog
+else ifeq ($(SECURE_FLUSH),true)
+CONNECTALFLAGS += --bscflags=" -D SECURITY "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_MSHR "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_ARBITER "
+CONNECTALFLAGS += --verilog $(PROC_DIR)/verilog
+else ifeq ($(SECURE_NONE),true)
+CONNECTALFLAGS += --bscflags=" -D SECURITY "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_TLB "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_BP "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_CACHE "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_MSHR "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_ARBITER "
+CONNECTALFLAGS += --verilog $(PROC_DIR)/verilog
+else ifeq ($(SECURE_MSHR),true)
+CONNECTALFLAGS += --bscflags=" -D SECURITY "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_TLB "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_BP "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_CACHE "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_ARBITER "
+CONNECTALFLAGS += --verilog $(PROC_DIR)/verilog
+else ifeq ($(SECURE_ARBITER),true)
+CONNECTALFLAGS += --bscflags=" -D SECURITY "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_TLB "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_BP "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_FLUSH_CACHE "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC "
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_LLC_MSHR "
+CONNECTALFLAGS += --verilog $(PROC_DIR)/verilog
+endif
+
+# simulate the effect of set-partition of LLC
+ifneq ($(SIM_LOG_LLC_PARTITION_NUM),)
+CONNECTALFLAGS += --bscflags=" -D SIM_LOG_LLC_PARTITION_NUM=$(SIM_LOG_LLC_PARTITION_NUM) "
+endif
+
+# simulate the effect of banked LLC MSHR
+ifneq ($(SIM_LOG_LLC_MSHR_BANK_NUM),)
+CONNECTALFLAGS += --bscflags=" -D SIM_LOG_LLC_MSHR_BANK_NUM=$(SIM_LOG_LLC_MSHR_BANK_NUM) "
+endif
+
+# simulate the effect of LLC arbiter
+ifneq ($(SIM_LLC_ARBITER_NUM),)
+CONNECTALFLAGS += --bscflags=" -D SIM_LLC_ARBITER_NUM=$(SIM_LLC_ARBITER_NUM) "
+else ifneq ($(SIM_LLC_ARBITER_LAT),)
+CONNECTALFLAGS += --bscflags=" -D SIM_LLC_ARBITER_LAT=$(SIM_LLC_ARBITER_LAT) "
+else
+endif
+
+# disable things related to bandwidth attack
+ifeq ($(DISABLE_SECURE_BW),true)
+CONNECTALFLAGS += --bscflags=" -D DISABLE_SECURE_BW "
+endif
+
+# perf counter
+ifeq ($(PERF_COUNT),true)
+CONNECTALFLAGS += --bscflags=" -D PERF_COUNT "
+endif
+
+# always use xilinx sync fifo
+CONNECTALFLAGS += --bscflags " -D USE_XILINX_SYNC_FIFO "
+
+# DO NOT use wire-based MSHR; it does not work
+#CONNECTALFLAGS += --bscflags=" -D UNSAFE_L1_CRQ_MSHR -D UNSAFE_L1_PRQ_MSHR -D UNSAFE_LL_CRQ_MSHR "
+
+# check deadlock
+ifeq ($(CHECK_DEADLOCK),true)
+CONNECTALFLAGS += --bscflags=" -D CHECK_DEADLOCK "
+endif
+
+# check rename error
+ifeq ($(RENAME_DEBUG),true)
+CONNECTALFLAGS += --bscflags=" -D RENAME_DEBUG "
+endif
+
+ifeq ($(ENCLAVE_DEBUG), true)
+CONNECTALFLAGS += --bscflags=" -D ENCLAVE_DEBUG "
+endif
+
+# FPU implementation
+ifeq ($(USE_XILINX_FPU),true)
+CONNECTALFLAGS += --bscflags=" -D USE_XILINX_FPU "
+endif
+
+# xilinx FMA latency (originally 4)
+XILINX_FP_FMA_LATENCY = 3
+CONNECTALFLAGS += --bscflags " -D XILINX_FP_FMA_LATENCY=$(XILINX_FP_FMA_LATENCY) "
+
+# xilinx multiplier latency (originally 3)
+XILINX_INT_MUL_LATENCY = 2
+CONNECTALFLAGS += --bscflags " -D XILINX_INT_MUL_LATENCY=$(XILINX_INT_MUL_LATENCY) "
+
+CONNECTALFLAGS += --bscflags=" +RTS -K1G -RTS " --bscflags=" -steps-max-intervals 200 "
+# I use dynamicAssert in bsv
+CONNECTALFLAGS += --bscflags=" -check-assert "
+# suppress "duplicate folder" and "unfolding over ... steps" warnings
+CONNECTALFLAGS += --bscflags=" -suppress-warnings S0073:G0024 "
+# verilator flags 
+VERILATOR_DEFINES = VM_PARALLEL_BUILDS=1 VERILATOR_PROJECT_ARGS="-output-split 10000"
+
+
+ifneq (,$(filter $(BOARD),vc707 awsf1))
+# synthesize for vc707 or awsf1
+
+AUTOTOP = --interface pins:ProcDmaWrapper.pins
+
+# sync FIFOs
+SYNC_FIFO_XCI = $(CONNECTALDIR)/out/$(BOARD)/sync_fifo_w32_d16/sync_fifo_w32_d16.xci
+SYNC_BRAM_FIFO_XCI = $(CONNECTALDIR)/out/$(BOARD)/sync_bram_fifo_w36_d512/sync_bram_fifo_w36_d512.xci
+
+CONNECTALFLAGS += --xci $(SYNC_FIFO_XCI) --xci $(SYNC_BRAM_FIFO_XCI)
+
+prebuild:: $(SYNC_FIFO_XCI) $(SYNC_BRAM_FIFO_XCI)
+
+$(SYNC_FIFO_XCI): $(CORE_SCRIPT_DIR)/synth_sync_fifo.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^)
+
+$(SYNC_BRAM_FIFO_XCI): $(CORE_SCRIPT_DIR)/synth_sync_bram_fifo.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^)
+
+# AWS needs to know sync fifo is used
+ifeq ($(BOARD),awsf1)
+CONNECTALFLAGS += -D AWSF1_SYNC_FIFO
+CONNECTALFLAGS += -D AWSF1_DERIVED_CLOCK=clk_extra_a1
+CONNECTALFLAGS += -D IMPORT_HOST_CLOCKS
+else
+CONNECTALFLAGS += -D IMPORT_HOSTIF
+endif
+
+# VC707 needs some more clocking constraints
+ifeq ($(BOARD),vc707)
+CONNECTALFLAGS += -C $(XILINX_IP_DIR)/vc707/constraints/clocks.xdc
+endif
+
+# DRAM
+ifeq ($(BOARD),vc707)
+PIN_TYPE = DDR3_1GB_Pins
+PIN_TYPE_INCLUDE = DDR3Common
+CONNECTALFLAGS += --bscflags " -D USE_VC707_DRAM " \
+				  --verilog $(XILINX_IP_DIR)/vc707/ddr3_1GB_bluespec/ \
+				  -C $(XILINX_IP_DIR)/vc707/constraints/ddr3_1GB_bluespec.xdc
+else
+PIN_TYPE = AWSDramPins
+PIN_TYPE_INCLUDE = AWSDramCommon
+CONNECTALFLAGS += -D AWSF1_DDR_A
+CONNECTALFLAGS += --bscflags " -D USE_AWSF1_DRAM "
+endif
+
+# FPU
+FP_FMA_XCI = $(CONNECTALDIR)/out/$(BOARD)/fp_fma/fp_fma.xci
+FP_DIV_XCI = $(CONNECTALDIR)/out/$(BOARD)/fp_div/fp_div.xci
+FP_SQRT_XCI = $(CONNECTALDIR)/out/$(BOARD)/fp_sqrt/fp_sqrt.xci
+
+# also configure the latency and rate (number of cycles per input) of IP core
+FP_FMA_LATENCY = $(XILINX_FP_FMA_LATENCY)
+FP_DIV_LATENCY = 12
+FP_DIV_RATE = 1
+FP_SQRT_LATENCY = 8
+FP_SQRT_RATE = 1
+
+CONNECTALFLAGS += --xci $(FP_FMA_XCI) --xci $(FP_DIV_XCI) --xci $(FP_SQRT_XCI)
+
+prebuild:: $(FP_FMA_XCI) $(FP_DIV_XCI) $(FP_SQRT_XCI)
+
+$(FP_FMA_XCI): $(CORE_SCRIPT_DIR)/synth_fp_fma.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^ -tclargs $(FP_FMA_LATENCY))
+
+$(FP_DIV_XCI): $(CORE_SCRIPT_DIR)/synth_fp_div.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^ -tclargs $(FP_DIV_LATENCY) $(FP_DIV_RATE))
+
+$(FP_SQRT_XCI): $(CORE_SCRIPT_DIR)/synth_fp_sqrt.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^ -tclargs $(FP_SQRT_LATENCY) $(FP_SQRT_RATE))
+
+# Force to generate IP core, because we pass args to synth tcl
+.PHONY: $(FP_FMA_XCI) $(FP_DIV_XCI) $(FP_SQRT_XCI)
+
+# AWS needs to know xilinx FPU is used
+ifeq ($(BOARD),awsf1)
+CONNECTALFLAGS += -D AWSF1_FPU
+endif
+
+# int mul/div
+INT_MUL_SIGNED_XCI = $(CONNECTALDIR)/out/$(BOARD)/int_mul_signed/int_mul_signed.xci
+INT_MUL_UNSIGNED_XCI = $(CONNECTALDIR)/out/$(BOARD)/int_mul_unsigned/int_mul_unsigned.xci
+INT_MUL_SIGNED_UNSIGNED_XCI = $(CONNECTALDIR)/out/$(BOARD)/int_mul_signed_unsigned/int_mul_signed_unsigned.xci
+INT_DIV_UNSIGNED_XCI = $(CONNECTALDIR)/out/$(BOARD)/int_div_unsigned/int_div_unsigned.xci
+
+# also configure the latency of IP core
+INT_MUL_LATENCY = $(XILINX_INT_MUL_LATENCY)
+INT_DIV_LATENCY = 12
+
+CONNECTALFLAGS += --xci $(INT_MUL_SIGNED_XCI) \
+				  --xci $(INT_MUL_UNSIGNED_XCI) \
+				  --xci $(INT_MUL_SIGNED_UNSIGNED_XCI) \
+				  --xci $(INT_DIV_UNSIGNED_XCI)
+
+prebuild:: $(INT_MUL_SIGNED_XCI) $(INT_DIV_UNSIGNED_XCI)
+
+$(INT_MUL_SIGNED_XCI): $(CORE_SCRIPT_DIR)/synth_int_mul.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^ -tclargs $(INT_MUL_LATENCY))
+
+$(INT_DIV_UNSIGNED_XCI): $(CORE_SCRIPT_DIR)/synth_int_div.tcl
+	(cd $(PROJECTDIR); vivado -mode batch -source $^ -tclargs $(INT_DIV_LATENCY))
+
+# Force to generate IP core, because we pass args to synth tcl
+.PHONY: $(INT_MUL_SIGNED_XCI) $(INT_DIV_UNSIGNED_XCI)
+
+# AWS needs to know int mul div are used
+ifeq ($(BOARD),awsf1)
+CONNECTALFLAGS += -D AWSF1_INT_MULDIV
+endif
+
+else
+# simulation
+# define BSIM to use simulation version of DRAM and enable assert
+CONNECTALFLAGS += --bscflags " -D BSIM " --cflags " -D BSIM " \
+				  --bscflags " -D USE_$(SIM_DRAM_TYPE)_DRAM "
+
+endif
+
+include $(CONNECTALDIR)/Makefile.connectal
+
+clean:
+	@echo "Use make clean.boardname"
+
+clean.%:
+	rm -rf $(BUILD_DIR)/$*
+
+# run tests
+TEST ?= assembly
+
+run:
+	@echo "Use make run.boardname"
+
+run.%:
+	$(PROC_DIR)/scripts/run_test.py --exe $(BUILD_DIR)/$*/bin/ubuntu.exe \
+		--rom $(RISCY_HOME)/procs/rom/out/rom_core_$(CORE_NUM) \
+		--test $(TEST) --cores $(CORE_NUM)
+

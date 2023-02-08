@@ -1,0 +1,46 @@
+#include <parameters.h>
+
+OUTPUT_ARCH( "riscv" )
+ENTRY( sm_entry )
+
+MEMORY
+{
+  SM_STATE (w) :  ORIGIN = SM_STATE_ADDR, LENGTH = SM_STATE_LEN
+  SM (wx) :       ORIGIN = SM_ADDR,       LENGTH = SM_LEN
+}
+
+SECTIONS
+{
+  . = ORIGIN(SM_STATE);
+  .sm_state : {
+    PROVIDE( sm_state = . );
+    *(.sm.state)
+  } > SM_STATE =0x0
+}
+
+SECTIONS
+{
+  . = ORIGIN(SM);
+  .text : {
+    PROVIDE( sm_entry = . );
+    KEEP( *(.text.entry) )
+    *(.text.*)
+    *(.text)
+  } > SM =0x0
+
+  .rodata ALIGN(64) : {
+    *(.rodata)  /* read-only data */
+    *(.rodata.*)
+  } > SM =0x0
+
+  .data ALIGN(64)  : {
+    *(.data)  /* initialized data */
+    *(.data.*)
+    *(.data.stacks)
+  } > SM =0x0
+
+  .bss ALIGN(64)  : {
+    *(.bss)   /* uninitialized data */
+    *(.bss.*)
+  } > SM =0x0
+}

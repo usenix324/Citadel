@@ -1,0 +1,41 @@
+# Assumes: $(SM_DIR)
+# Assumes: $(BUILD_DIR)
+# Assumes: $(ENCLAVE_SRC_DIR)
+# Assumes: $(QUEUE_SRC_DIR)
+# Assumes: $(CC)
+# Assumes: $(OBJCOPY)
+
+
+
+# Enclave
+CFLAGS_ENCLAVE := -march=rv64g -mcmodel=medany -mabi=lp64 -fno-common -fno-tree-loop-distribute-patterns -std=gnu11 -Wall -O1 -ggdb3
+
+
+ENCLAVE_ELF := $(BUILD_DIR)/enclave.elf
+ENCLAVE_BIN := $(BUILD_DIR)/enclave.bin
+
+ENCLAVE_INCLUDES := \
+	$(PLATFORM_DIR) \
+	$(API_DIR) \
+	$(INFRA_DIR) \
+	$(ENCLAVE_SRC_DIR) \
+	$(QUEUE_SRC_DIR) \
+
+ENCLAVE_SRC := \
+  $(INFRA_DIR)/clib/memset.c \
+  $(INFRA_DIR)/clib/memcpy.c \
+  $(ENCLAVE_SRC_DIR)/enclave_entry.S \
+  $(ENCLAVE_SRC_DIR)/enclave_code.c \
+  $(ENCLAVE_SRC_DIR)/enclave_stack.S \
+  $(QUEUE_SRC_DIR)/msgq.c \
+
+ENCLAVE_LD := $(ENCLAVE_SRC_DIR)/enclave.lds
+
+$(ENCLAVE_ELF): $(ENCLAVE_SRC) $(ENCLAVE_LD) $(BUILD_DIR) $(LIB_SRCS)
+	$(CC) $(CFLAGS_ENCLAVE) $(addprefix -I , $(ENCLAVE_INCLUDES)) $(LDFLAGS) -T $(ENCLAVE_LD) $(ENCLAVE_SRC) $(LIB_SRCS) -o $@
+
+$(ENCLAVE_BIN): $(ENCLAVE_ELF)
+	$(OBJCOPY) -O binary $< $@
+
+.PHONY: enclave
+enclave : $(ENCLAVE_BIN)

@@ -1,0 +1,675 @@
+{
+    "options": {
+        "bsvdefines" : ["XILINX=1", "ZYNQ", "ZynqHostInterface", "PhysAddrWidth=32", "CFGBVS=VCCO", "CONFIG_VOLTAGE=3.3",
+			"CONNECTAL_BITS_DEPENDENCES=hw/mkTop.bit", "CONNECTAL_RUN_SCRIPT=$(CONNECTALDIR)/scripts/run.pcietest",
+			"CONNECTAL_EXENAME=ubuntu.exe", "CONNECTAL_EXENAME2=ubuntu.exe2"
+		       ],
+        "os" : "ubuntu",
+	"arch" : "arm",
+	"toolchain" : "arm-linux-gnueabihf-",
+        "partname" : "xc7z020clg484-1",
+        "rewireclockstring" : "tclzynqrewireclock",
+        "constraints": [],
+        "implconstraints": ["constraints/xilinx/zc7z020clg484.xdc"],
+        "TOP" : "ZynqTop",
+        "runscript" : "run.pcietest",
+        "CONNECTALFLAGS" : ["--mainclockperiod=10", "--derivedclockperiod=5"],
+        "need_pcie" : "unused"
+    },
+    "fmc1": {
+    "LA00_CC_P": {
+        "PACKAGE_PIN": "M19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA00_CC_N": {
+        "PACKAGE_PIN": "M20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA01_CC_P": {
+        "PACKAGE_PIN": "N19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA01_CC_N": {
+        "PACKAGE_PIN": "N20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA02_P": {
+        "PACKAGE_PIN": "P17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA02_N": {
+        "PACKAGE_PIN": "P18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA03_P": {
+        "PACKAGE_PIN": "N22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA03_N": {
+        "PACKAGE_PIN": "P22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA04_P": {
+        "PACKAGE_PIN": "M21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA04_N": {
+        "PACKAGE_PIN": "M22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA05_P": {
+        "PACKAGE_PIN": "J18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA05_N": {
+        "PACKAGE_PIN": "K18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA06_P": {
+        "PACKAGE_PIN": "L21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA06_N": {
+        "PACKAGE_PIN": "L22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA07_P": {
+        "PACKAGE_PIN": "T16",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA07_N": {
+        "PACKAGE_PIN": "T17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA08_P": {
+        "PACKAGE_PIN": "J21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA08_N": {
+        "PACKAGE_PIN": "J22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA09_P": {
+        "PACKAGE_PIN": "R20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA09_N": {
+        "PACKAGE_PIN": "R21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA10_P": {
+        "PACKAGE_PIN": "R19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA10_N": {
+        "PACKAGE_PIN": "T19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA11_P": {
+        "PACKAGE_PIN": "N17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA11_N": {
+        "PACKAGE_PIN": "N18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA12_P": {
+        "PACKAGE_PIN": "P20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA12_N": {
+        "PACKAGE_PIN": "P21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA13_P": {
+        "PACKAGE_PIN": "L17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA13_N": {
+        "PACKAGE_PIN": "M17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA14_P": {
+        "PACKAGE_PIN": "K19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA14_N": {
+        "PACKAGE_PIN": "K20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA15_P": {
+        "PACKAGE_PIN": "J16",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA15_N": {
+        "PACKAGE_PIN": "J17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA16_P": {
+        "PACKAGE_PIN": "J20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA16_N": {
+        "PACKAGE_PIN": "K21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA17_CC_P": {
+        "PACKAGE_PIN": "B19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA17_CC_N": {
+        "PACKAGE_PIN": "B20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA18_CC_P": {
+        "PACKAGE_PIN": "D20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA18_CC_N": {
+        "PACKAGE_PIN": "C20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA19_P": {
+        "PACKAGE_PIN": "G15",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA19_N": {
+        "PACKAGE_PIN": "G16",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA20_P": {
+        "PACKAGE_PIN": "G20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA20_N": {
+        "PACKAGE_PIN": "G21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA21_P": {
+        "PACKAGE_PIN": "E19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA21_N": {
+        "PACKAGE_PIN": "E20",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA22_P": {
+        "PACKAGE_PIN": "G19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA22_N": {
+        "PACKAGE_PIN": "F19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA23_P": {
+        "PACKAGE_PIN": "E15",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA23_N": {
+        "PACKAGE_PIN": "D15",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA24_P": {
+        "PACKAGE_PIN": "A18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA24_N": {
+        "PACKAGE_PIN": "A19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA25_P": {
+        "PACKAGE_PIN": "D22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA25_N": {
+        "PACKAGE_PIN": "C22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA26_P": {
+        "PACKAGE_PIN": "F18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA26_N": {
+        "PACKAGE_PIN": "E18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA27_P": {
+        "PACKAGE_PIN": "E21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA27_N": {
+        "PACKAGE_PIN": "D21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA28_P": {
+        "PACKAGE_PIN": "A16",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA28_N": {
+        "PACKAGE_PIN": "A17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA29_P": {
+        "PACKAGE_PIN": "C17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA29_N": {
+        "PACKAGE_PIN": "C18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA30_P": {
+        "PACKAGE_PIN": "C15",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA30_N": {
+        "PACKAGE_PIN": "B15",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA31_P": {
+        "PACKAGE_PIN": "B16",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA31_N": {
+        "PACKAGE_PIN": "B17",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA32_P": {
+        "PACKAGE_PIN": "A21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA32_N": {
+        "PACKAGE_PIN": "A22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA33_P": {
+        "PACKAGE_PIN": "B21",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "LA33_N": {
+        "PACKAGE_PIN": "B22",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "CLK0_M2C_P": {
+        "PACKAGE_PIN": "L18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "CLK0_M2C_N": {
+        "PACKAGE_PIN": "L19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "CLK1_M2C_P": {
+        "PACKAGE_PIN": "D18",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "CLK1_M2C_N": {
+        "PACKAGE_PIN": "C19",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "SDA": {
+        "PACKAGE_PIN": "U7",
+        "IOSTANDARD": "LVCMOS25"
+        },
+    "SCL": {
+        "PACKAGE_PIN": "R7",
+        "IOSTANDARD": "LVCMOS25"
+        }
+    },
+    "pins": {
+	"GPIO_sw_left": {
+	    "PACKAGE_PIN": "N15",
+	    "IOSTANDARD": "LVCMOS18",
+	    "slew": "SLOW",
+	    "PIO_DIRECTION": "INPUT"
+	},
+	"GPIO_sw_center": {
+	    "PACKAGE_PIN": "P16",
+	    "IOSTANDARD": "LVCMOS18",
+	    "slew": "SLOW",
+	    "PIO_DIRECTION": "INPUT"
+	},
+	"GPIO_sw_right": {
+	    "PACKAGE_PIN": "R18",
+	    "IOSTANDARD": "LVCMOS18",
+	    "slew": "SLOW",
+	    "PIO_DIRECTION": "INPUT"
+	},
+	"GPIO_sw_down": {
+	    "PACKAGE_PIN": "R16",
+	    "IOSTANDARD": "LVCMOS18",
+	    "slew": "SLOW",
+	    "PIO_DIRECTION": "INPUT"
+	},
+	"GPIO_sw_up": {
+	    "PACKAGE_PIN": "T18",
+	    "IOSTANDARD": "LVCMOS18",
+	    "slew": "SLOW",
+	    "PIO_DIRECTION": "INPUT"
+	}
+    },
+    "pmoda" : {
+        "J1" : {
+             "PACKAGE_PIN" : "Y11",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J2" : {
+             "PACKAGE_PIN" : "AA11",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J3" : {
+             "PACKAGE_PIN" : "Y10",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J4" : {
+             "PACKAGE_PIN" : "AA9",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J7" : {
+             "PACKAGE_PIN" : "AB11",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J8" : {
+             "PACKAGE_PIN" : "AB10",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J9" : {
+             "PACKAGE_PIN" : "AB9",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J10" : {
+             "PACKAGE_PIN" : "AA8",
+	     "IOSTANDARD" : "LVCMOS33"
+	     }	 
+    },
+    "pmodb" : {
+        "J1" : {
+             "PACKAGE_PIN" : "W12",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J2" : {
+             "PACKAGE_PIN" : "W11",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J3" : {
+             "PACKAGE_PIN" : "V10",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J4" : {
+             "PACKAGE_PIN" : "W8",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J7" : {
+             "PACKAGE_PIN" : "V12",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J8" : {
+             "PACKAGE_PIN" : "W10",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J9" : {
+             "PACKAGE_PIN" : "V9",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J10" : {
+             "PACKAGE_PIN" : "V8",
+	     "IOSTANDARD" : "LVCMOS33"
+	     }	 
+    },
+    "pmodc" : {
+        "J1" : {
+             "PACKAGE_PIN" : "AB7",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J2" : {
+             "PACKAGE_PIN" : "AB6",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J3" : {
+             "PACKAGE_PIN" : "Y4",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J4" : {
+             "PACKAGE_PIN" : "AA4",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J7" : {
+             "PACKAGE_PIN" : "R6",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J8" : {
+             "PACKAGE_PIN" : "T6",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J9" : {
+             "PACKAGE_PIN" : "T4",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J10" : {
+             "PACKAGE_PIN" : "U4",
+	     "IOSTANDARD" : "LVCMOS33"
+	     }	 
+    },
+    "pmodd" : {
+        "J1" : {
+             "PACKAGE_PIN" : "V7",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J2" : {
+             "PACKAGE_PIN" : "W7",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J3" : {
+             "PACKAGE_PIN" : "V5",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J4" : {
+             "PACKAGE_PIN" : "V4",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J7" : {
+             "PACKAGE_PIN" : "W6",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J8" : {
+             "PACKAGE_PIN" : "W5",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J9" : {
+             "PACKAGE_PIN" : "U6",
+	     "IOSTANDARD" : "LVCMOS33"
+	     },
+        "J10" : {
+             "PACKAGE_PIN" : "U5",
+	     "IOSTANDARD" : "LVCMOS33"
+	     }	 
+    },
+    "pmode_documentation_only;cannot use from PL" : {
+        "MIO13" : {
+             "PACKAGE_PIN" : "A6",
+	     "CONNECTORPIN" : "JE1"
+	     },
+        "MIO10" : {
+             "PACKAGE_PIN" : "G7",
+	     "CONNECTORPIN" : "JE2"
+	     },
+        "MIO11" : {
+             "PACKAGE_PIN" : "B4",
+	     "CONNECTORPIN" : "JE3"
+	     },
+        "MIO12" : {
+             "PACKAGE_PIN" : "C5",
+	     "CONNECTORPIN" : "JE4"
+	     },
+        "MIO0" : {
+             "PACKAGE_PIN" : "G6",
+	     "CONNECTORPIN" : "JE7"
+	     },
+        "MIO9" : {
+             "PACKAGE_PIN" : "C4",
+	     "CONNECTORPIN" : "JE8"
+	     },
+        "MIO14" : {
+             "PACKAGE_PIN" : "B6",
+	     "CONNECTORPIN" : "JE9"
+	     },
+        "MIO15" : {
+             "PACKAGE_PIN" : "E6",
+	     "CONNECTORPIN" : "JE10"
+	     }
+    },
+    "leds" : {
+    	"L0" : {
+	     "PACKAGE_PIN" : "T22",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L1" : {
+	     "PACKAGE_PIN" : "T21",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L2" : {
+	     "PACKAGE_PIN" : "U22",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L3" : {
+	     "PACKAGE_PIN" : "U21",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L4" : {
+	     "PACKAGE_PIN" : "V22",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L5" : {
+	     "PACKAGE_PIN" : "W22",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L6" : {
+	     "PACKAGE_PIN" : "U19",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     },
+    	"L7" : {
+	     "PACKAGE_PIN" : "U14",
+             "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION" : "OUTPUT"
+	     }
+    },  
+    "i2c0" : {
+        "scl" : {
+             "PACKAGE_PIN" : "AA18",
+	     "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION": "BIDIR"
+	     },
+        "sda" : {
+             "PACKAGE_PIN" : "Y16",
+	     "IOSTANDARD" : "LVCMOS25",
+	     "PIO_DIRECTION": "BIDIR"
+	     }	 
+    },
+    "hdmi" : {
+        "clock" : {
+             "PACKAGE_PIN" : "W18",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "hsync" : {
+             "PACKAGE_PIN" : "V17",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "vsync" : {
+             "PACKAGE_PIN" : "W17",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "de" : {
+             "PACKAGE_PIN" : "U16",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[0]" : {
+             "PACKAGE_PIN" : "Y13",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[1]" : {
+             "PACKAGE_PIN" : "AA13",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[2]" : {
+             "PACKAGE_PIN" : "AA14",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[3]" : {
+             "PACKAGE_PIN" : "Y14",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[4]" : {
+             "PACKAGE_PIN" : "AB15",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[5]" : {
+             "PACKAGE_PIN" : "AB16",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[6]" : {
+             "PACKAGE_PIN" : "AA16",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[7]" : {
+             "PACKAGE_PIN" : "AB17",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[8]" : {
+             "PACKAGE_PIN" : "AA17",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[9]" : {
+             "PACKAGE_PIN" : "Y15",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[10]" : {
+             "PACKAGE_PIN" : "W13",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[11]" : {
+             "PACKAGE_PIN" : "W15",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[12]" : {
+             "PACKAGE_PIN" : "V15",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[13]" : {
+             "PACKAGE_PIN" : "U17",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[14]" : {
+             "PACKAGE_PIN" : "V14",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     },
+        "data[15]" : {
+             "PACKAGE_PIN" : "V13",
+	     "IOSTANDARD" : "LVCMOS25",
+             "PIO_DIRECTION": "OUTPUT"
+	     }
+    }
+}

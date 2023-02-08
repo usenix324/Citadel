@@ -1,0 +1,88 @@
+# Assumes: $(PYTHON)
+# Assumes: $(BUILD_DIR)
+# Assumes: $(SM_TEST_DIR)
+# Assumes: $(ENCLAVE_SRC_DIR)
+# Assumes: $(CC)
+# Assumes: $(OBJCOPY)
+# Assumes: $(SM_BINARY)
+# Assumes: $(IDPT_BIN)
+# Assumes: $(NULL_BOOT_BINARY)
+
+include $(ENCLAVE_SRC_DIR)/Makefrag
+
+# Flags
+SM_TEST_CFLAGS := $(CFLAGS)
+SM_TEST_LDFLAGS := $(LDFLAGS)
+
+# Linker Script
+SM_TEST_LD :=  $(BUILD_DIR)/test.lds
+# Preprocessor fills out linker script constants
+$(BUILD_DIR)/test.lds : $(SM_TEST_DIR)/test.lds.in $(BUILD_DIR)
+	$(CC) -E -x c $(addprefix -I , $(PLATFORM_DIR)) $< | grep -v '^#' > $@
+
+## Common Among Tests
+
+# Binaries
+SM_BINARY := $(BUILD_DIR)/sm.bin
+
+# Sources
+ALL_TESTS_SRC := \
+	$(SM_TEST_DIR)/test_entry.S \
+	$(INFRA_DIR)/sm_keys.c \
+	$(INFRA_DIR)/sm_binary.S \
+	$(PLATFORM_DIR)/idpt.S \
+	$(PLATFORM_DIR)/htif/htif_for_linking.c \
+	$(SM_TEST_DIR)/sbi/console.c \
+
+# Headers
+SM_TEST_INCLUDES := \
+	$(PLATFORM_DIR) \
+	$(API_DIR) \
+	$(SM_TEST_DIR) \
+	$(SM_SRC_DIR) \
+
+# Test Directory
+UNIT_TESTS_DIR := $(SM_TEST_DIR)/unit_tests
+
+## null_test
+
+# Target
+NULL_TEST_ELF:=$(BUILD_DIR)/null_test.elf
+
+# Rules
+$(NULL_TEST_ELF): $(UNIT_TESTS_DIR)/null_test.c $(ALL_TESTS_SRC) $(SM_TEST_LD) $(BUILD_DIR) $(SM_BINARY) $(IDPT_BIN)
+	$(CC) $(SM_CFLAGS) $(addprefix -I , $(SM_TEST_INCLUDES)) $(SM_TEST_LDFLAGS) -T $(SM_TEST_LD) $< $(ALL_TESTS_SRC) -D IDPT_FILE=\"$(IDPT_BIN)\" -D SM_BINARY_FILE=\"$(SM_BINARY)\" -o $@
+
+.PHONY: null_test
+null_test: $(NULL_TEST_ELF)
+
+.PHONY: run_null_test
+run_null_test: check_env $(NULL_BOOT_BINARY) $(NULL_TEST_ELF)
+	$(SANCTUM_QEMU) $(QEMU_FLAGS) --kernel $(NULL_TEST_ELF) --bios $(NULL_BOOT_BINARY)
+
+
+## master_test
+
+# Target
+MASTER_TEST_ELF:=$(BUILD_DIR)/master_test.elf
+
+# Sources
+MASTER_TEST_SRC := \
+	$(UNIT_TESTS_DIR)/master_test.c \
+	$(UNIT_TESTS_DIR)/enclave_bin.S \
+	$(ALL_TESTS_SRC) \
+
+# Rules
+$(MASTER_TEST_ELF): $(MASTER_TEST_SRC) $(SM_TEST_LD) $(BUILD_DIR) $(SM_BINARY) $(ENCLAVE_BIN) $(IDPT_BIN)
+	$(CC) $(SM_CFLAGS) $(addprefix -I , $(SM_TEST_INCLUDES)) $(SM_TEST_LDFLAGS) -T $(SM_TEST_LD) $(MASTER_TEST_SRC) -D IDPT_FILE=\"$(IDPT_BIN)\" -D ENCLAVE_BINARY_FILE=\"$(ENCLAVE_BIN)\" -D SM_BINARY_FILE=\"$(SM_BINARY)\" -o $@
+
+.PHONY: master_test
+master_test: $(MASTER_TEST_ELF)
+
+.PHONY: run_master_test
+run_master_test: check_env $(NULL_BOOT_BINARY) $(MASTER_TEST_ELF)
+	$(SANCTUM_QEMU) $(QEMU_FLAGS) --kernel $(MASTER_TEST_ELF) --bios $(NULL_BOOT_BINARY)
+
+.PHONY: debug_master_test
+debug_master_test: check_env $(NULL_BOOT_BINARY) $(MASTER_TEST_ELF) 
+	$(SANCTUM_QEMU) $(QEMU_FLAGS) $(DEBUG_QEMU_FLAGS) --kernel $(MASTER_TEST_ELF) --bios $(NULL_BOOT_BINARY)

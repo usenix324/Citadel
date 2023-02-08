@@ -1,0 +1,12 @@
+set arch riscv:rv64
+#set riscv use_compressed_breakpoint off
+layout split
+foc cmd
+set trace-commands on
+set logging on
+target remote localhost:1234
+symbol-file build_linux/riscv-linux/vmlinux
+add-symbol-file build_linux/riscv-linux/vmlinux 0x82000000
+add-symbol-file ../secure_shared_memory/build/sm.elf 0x80000000
+add-symbol-file ../secure_shared_memory/build/sm.enclave.elf 0xf8001000
+add-symbol-file ../AES_enclave/build/enclave.elf 0x0
